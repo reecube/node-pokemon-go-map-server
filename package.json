@@ -2,7 +2,7 @@
   "name": "node-pokemon-go-map-server",
   "version": "0.0.1",
   "description": "TODO",
-  "main": "index.js",
+  "main": "module/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,7 +17,9 @@
   },
   "homepage": "https://github.com/reecube/node-pokemon-go-map-server#readme",
   "dependencies": {
+    "async": "^2.0.1",
     "express": "^4.14.0",
+    "lodash": "^4.14.0",
     "pokemon-go-node-api": "git+https://github.com/Armax/Pokemon-GO-node-api.git",
     "swig": "^1.4.2"
   }
