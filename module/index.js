@@ -2,8 +2,7 @@
 
 let Core = require('./index-core'),
     core = Core(),
-    pgo = require('pokemon-go-node-api'),
-    pokedex = require('./data/pokedex.json'),
+    PGO = require('./index-pgo'),
     swig = require('swig'),
     express = require('express'),
     app = express();
@@ -16,14 +15,7 @@ app.set('views', __dirname + '/templates');
 
 app.use('/', express.static(__dirname + '/public'));
 
-app.get('/', function (req, res) {
-    res.render('index', {
-        title: 'Pokemon GO Map',
-        // TODO
-        jsConfig: JSON.stringify(false),
-        apiKey: core.config.pgo.maps.apikey
-    });
-});
+app.get('/', PGO(core));
 
 app.listen(core.config.server.port, function () {
     console.log('server listening on http://localhost:' + core.config.server.port + '/');
