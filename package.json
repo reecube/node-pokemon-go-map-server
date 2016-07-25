@@ -1,0 +1,24 @@
+{
+  "name": "node-pokemon-go-map-server",
+  "version": "0.0.1",
+  "description": "TODO",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reecube/node-pokemon-go-map-server.git"
+  },
+  "author": "ReeCube",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/reecube/node-pokemon-go-map-server/issues"
+  },
+  "homepage": "https://github.com/reecube/node-pokemon-go-map-server#readme",
+  "dependencies": {
+    "express": "^4.14.0",
+    "pokemon-go-node-api": "git+https://github.com/Armax/Pokemon-GO-node-api.git",
+    "swig": "^1.4.2"
+  }
+}
