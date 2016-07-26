@@ -62,7 +62,7 @@ function initMap() {
         });
     }
 
-    setInterval(function () {
+    var updatePokemon = function () {
         var elements = document.querySelectorAll('[data-ts-hidden]');
 
         elements.forEach(function (elm) {
@@ -79,5 +79,8 @@ function initMap() {
                 elm.innerHTML = 'Error: ' + restSecs;
             }
         });
-    }, 500);
+
+        setTimeout(updatePokemon, 500);
+    };
+    updatePokemon();
 }
