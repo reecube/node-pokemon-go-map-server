@@ -129,4 +129,5 @@ build/Release
 node_modules
 
 # project ignores
-# TODO: /example/example-config.json
+/https-key.pem
+/https-cert.pem

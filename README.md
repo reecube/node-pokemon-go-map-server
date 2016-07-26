@@ -39,3 +39,12 @@ Then make the config file, here is an example:
 ```
 
 This file is stored under `TODO`.
+
+## HTTPS Certificates
+
+```
+$ openssl genrsa -out https-key.pem 1024 
+$ openssl req -new -key https-key.pem -out certrequest.csr
+... bunch of prompts
+$ openssl x509 -req -in certrequest.csr -signkey https-key.pem -out https-cert.pem
+```
