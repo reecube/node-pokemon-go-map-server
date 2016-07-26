@@ -4,10 +4,26 @@ module.exports = function (core) {
     let pgoConfig = core.config.pgo,
         pgo = require('pokemon-go-node-api'),
         pokedex = require('./data/pokedex.json'),
+        showError = function (req, res, msg, status) {
+            status = status || 500;
+
+            res.status(status).send({
+                'error': true,
+                'message': msg
+            });
+        },
         handleError = function (req, res, err) {
             console.error('[!] An error occured!');
             console.trace(err);
+
             res.status(500).send(err);
+        },
+        cbSuccess = function (req, res, jsConfig) {
+            res.render('index', {
+                title: 'Pokemon GO Map',
+                jsConfig: JSON.stringify(jsConfig),
+                apiKey: core.config.pgo.maps.apikey
+            });
         },
         safeCallback = function (req, res, cb) {
             return function (p1, p2, p3, p4, p5, p6) {
@@ -17,13 +33,6 @@ module.exports = function (core) {
                     return handleError(req, res, ex);
                 }
             };
-        },
-        cbSuccess = function (req, res, jsConfig) {
-            res.render('index', {
-                title: 'Pokemon GO Map',
-                jsConfig: JSON.stringify(jsConfig),
-                apiKey: core.config.pgo.maps.apikey
-            });
         },
         getPokemonByNumber = function (pokedexNumber) {
             return pokedex.pokemon[pokedexNumber - 1];
@@ -205,9 +214,9 @@ module.exports = function (core) {
 
                 if (api_endpoint) {
                     // FIXME: this should already happen in poke.io.js
-                    pgo.GetProfile(safeCallback(req, res, cbGetProfile));
+                    return pgo.GetProfile(safeCallback(req, res, cbGetProfile));
                 } else {
-                    console.error('[!] RPC Server offline');
+                    return showError(req, res, 'RPC Server offline', 503);
                 }
             }));
         };
