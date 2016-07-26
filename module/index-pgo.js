@@ -2,7 +2,6 @@
 
 module.exports = function (core) {
     let pgoConfig = core.config.pgo,
-        pgo = require('pokemon-go-node-api'),
         pokedex = require('./data/pokedex.json'),
         handleError = function (req, res, err) {
             console.error('[!] An error occured!');
@@ -30,6 +29,8 @@ module.exports = function (core) {
         };
 
     return function (req, res) {
+        let pgo = require('pokemon-go-node-api');
+        
         pgo.init(pgoConfig.username, pgoConfig.password, pgoConfig.location, pgoConfig.provider, safeCallback(req, res, function (err) {
             if (err) return handleError(req, res, err);
 
