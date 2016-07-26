@@ -64,6 +64,31 @@ module.exports = function (core) {
                 console.log('[i] Pokecoin: ' + pokecoin);
                 console.log('[i] Stardust: ' + stardust);
 
+                let steps = pgoConfig.steps || 1,
+                    paramSteps = '';
+
+                if (req.body && req.body.steps) {
+                    paramSteps = req.body.steps;
+                } else if (req.query && req.query.steps) {
+                    paramSteps = req.query.steps;
+                }
+
+                if (paramSteps) {
+                    try {
+                        steps = parseInt(paramSteps);
+
+                        if (steps < 1) {
+                            // min
+                            steps = 1;
+                        } else if (steps > 10) {
+                            // max
+                            steps = 10;
+                        }
+                    } catch (err) {
+                        return handleError(req, res, err);
+                    }
+                }
+
                 let nearbyPokemon = [],
                     queueLocations = [],
                     pgoLoc = pgo.GetLocationCoords(),
@@ -97,7 +122,6 @@ module.exports = function (core) {
                         });
                     },
                     delta = 0.0025,
-                    steps = pgoConfig.steps || 1,
                     pgoLat = pgoLoc.latitude - (steps / 2) * delta,
                     pgoLng = pgoLoc.longitude - (steps / 2) * delta,
                     pgoAlt = pgoLoc.altitude,
@@ -189,14 +213,31 @@ module.exports = function (core) {
         };
 
     return function (req, res) {
+        let newLocation = pgoConfig.location,
+            paramLoc = '';
+
+        if (req.body && req.body.location) {
+            paramLoc = req.body.location;
+        } else if (req.query && req.query.location) {
+            paramLoc = req.query.location;
+        }
+
+        if (paramLoc) {
+            try {
+                newLocation = JSON.parse(paramLoc);
+            } catch (err) {
+                return handleError(req, res, err);
+            }
+        }
+
         if (!!pgo.playerInfo.accessToken) {
-            return pgo.SetLocation(pgoConfig.location, safeCallback(req, res, function (err) {
+            return pgo.SetLocation(newLocation, safeCallback(req, res, function (err) {
                 if (err) return handleError(req, res, err);
-                
+
                 return doAllTheStuff(req, res);
             }));
         } else {
-            pgo.init(pgoConfig.username, pgoConfig.password, pgoConfig.location, pgoConfig.provider, safeCallback(req, res, function (err) {
+            pgo.init(pgoConfig.username, pgoConfig.password, newLocation, pgoConfig.provider, safeCallback(req, res, function (err) {
                 if (err) return handleError(req, res, err);
 
                 return doAllTheStuff(req, res);
