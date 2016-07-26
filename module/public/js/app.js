@@ -65,8 +65,8 @@ function initMap() {
     var updatePokemon = function () {
         var elements = document.querySelectorAll('[data-ts-hidden]');
 
-        elements.forEach(function (elm) {
-            var dataTsHidden = elm.getAttribute('data-ts-hidden'),
+        for (var i = 0; i < elements.length; i++) {
+            var dataTsHidden = elements[i].getAttribute('data-ts-hidden'),
                 tsHidden = parseInt(dataTsHidden),
                 rest = tsHidden - new Date().getTime(),
                 restSecs = Math.round(rest / 1000),
@@ -74,11 +74,11 @@ function initMap() {
                 realMins = (restSecs - realSecs) / 60;
 
             if (rest > 0) {
-                elm.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
+                elements[i].innerHTML = realMins + 'mins, ' + realSecs + 'secs';
             } else {
-                elm.innerHTML = 'Error: ' + restSecs;
+                elements[i].innerHTML = 'Error: ' + restSecs;
             }
-        });
+        }
 
         setTimeout(updatePokemon, 500);
     };
