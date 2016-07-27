@@ -2,7 +2,8 @@
 
 module.exports = function (core) {
     let pgoConfig = core.config.pgo,
-        pgo = require('pokemon-go-node-api'),
+        pgoApi = require('pokemon-go-node-api'),
+        pgo,
         pokedex = require('./data/pokedex.json'),
         showError = function (req, res, msg, status) {
             status = status || 500;
@@ -239,18 +240,11 @@ module.exports = function (core) {
             }
         }
 
-        if (!!pgo.playerInfo.accessToken) {
-            return pgo.SetLocation(newLocation, safeCallback(req, res, function (err) {
-                if (err) return handleError(req, res, err);
+        pgo = new pgoApi.Pokeio();
+        pgo.init(pgoConfig.username, pgoConfig.password, newLocation, pgoConfig.provider, safeCallback(req, res, function (err) {
+            if (err) return handleError(req, res, err);
 
-                return doAllTheStuff(req, res);
-            }));
-        } else {
-            pgo.init(pgoConfig.username, pgoConfig.password, newLocation, pgoConfig.provider, safeCallback(req, res, function (err) {
-                if (err) return handleError(req, res, err);
-
-                return doAllTheStuff(req, res);
-            }));
-        }
+            return doAllTheStuff(req, res);
+        }));
     };
 };
