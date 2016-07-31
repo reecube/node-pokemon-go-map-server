@@ -131,3 +131,7 @@ node_modules
 # project ignores
 /https-key.pem
 /https-cert.pem
+/client/www/*
+!/client/www/.gitkeep
+/server/config/*
+!/server/config/.gitkeep

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% block head %}
+        {% block headMeta %}
+            <meta charset="utf-8">
+            <meta name="viewport"
+                  content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+            <meta name="apple-mobile-web-app-capable" content="yes">
+            <meta name="apple-mobile-web-app-status-bar-style" content="default">
+        {% endblock %}
+        {% block headTitle %}
+            <title>{{ app.title }}</title>
+        {% endblock %}
+        {% block headStylesheets %}
+            <link rel="stylesheet" href="vendor/framework7/css/framework7.ios.min.css">
+            <link rel="stylesheet" href="vendor/framework7/css/framework7.ios.colors.min.css">
+            <link rel="stylesheet" href="fonts/icons/style.css">
+            <link rel="stylesheet" href="css/app.min.css">
+        {% endblock %}
+        {% block headCustom %}
+        {% endblock %}
+    {% endblock %}
+</head>
+<body>
+{% block body %}
+    {% block statusbarOverlay %}
+        <div class="statusbar-overlay bg-gray"></div>
+    {% endblock %}
+    {% block panels %}
+        {% block panelsOverlay %}
+            <div class="panel-overlay"></div>
+        {% endblock %}
+        {% if panels.left %}
+            {% include 'panels/left.twig' with panels.left %}
+        {% endif %}
+        {% if panels.right %}
+            {% include 'panels/right.twig' with panels.right %}
+        {% endif %}
+    {% endblock %}
+    {% block views %}
+        <div class="views tabs">
+            {% for view in views %}
+                {% if view.twig %}
+                    {% include view.twig with view %}
+                {% else %}
+                    {% include ('views/' ~ view.name ~ '/view.twig') with view %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endblock %}
+{% endblock %}
+{% block footer %}
+    {% block footerTemplates %}
+        {% for template in templates %}
+            {% if template.twig %}
+                {% include template.twig with template %}
+            {% else %}
+                {% include ('templates/' ~ template ~ '.twig') with template %}
+            {% endif %}
+        {% endfor %}
+    {% endblock %}
+    {% block footerScripts %}
+        {% if viewMain %}
+        <script type="text/javascript">
+            var appMainView = '{{ viewMain }}';
+        </script>
+        {% endif %}
+        <script type="text/javascript" src="vendor/framework7/js/framework7.js"></script>
+        <script type="text/javascript" src="vendor/underscore/underscore.min.js"></script>
+        <script type="text/javascript" src="js/app.min.js"></script>
+    {% endblock %}
+    {% block footerCustom %}
+    {% endblock %}
+{% endblock %}
+</body>
+</html>

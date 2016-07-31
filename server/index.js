@@ -8,6 +8,11 @@ let Core = require('./index-core'),
     swig = require('swig'),
     express = require('express'),
     app = express(),
+// vars
+    pathClient = core.node.path.normalize(core.node.path.join(__dirname, '..', 'client')),
+    pathPublic = core.node.path.join(pathClient, 'www'),
+    pathPublicSrc = core.node.path.join(pathClient, 'www-src'),
+    pathTemplates = core.node.path.join(pathPublicSrc, 'templates'),
 // https
     pathKey = './https-key.pem',
     pathCert = './https-cert.pem';
@@ -16,9 +21,9 @@ app.engine('swig', swig.renderFile);
 
 app.set('view engine', 'swig');
 
-app.set('views', __dirname + '/templates');
+app.set('views', pathTemplates);
 
-app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(pathPublic));
 
 app.get('/', PGO(core));
 

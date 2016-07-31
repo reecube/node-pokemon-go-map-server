@@ -2,7 +2,7 @@
   "name": "node-pokemon-go-map-server",
   "version": "0.0.1",
   "description": "TODO",
-  "main": "module/index.js",
+  "main": "server/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

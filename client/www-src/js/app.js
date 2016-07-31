@@ -3,7 +3,7 @@ function initMap() {
                 pokemon: []
             },
         map = new google.maps.Map(document.getElementById('map'), {
-            minZoom: 15,
+            minZoom: 12,
             zoom: config.zoom,
             center: config.location
         }),

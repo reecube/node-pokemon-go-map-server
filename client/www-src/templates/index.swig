@@ -4,11 +4,11 @@
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
     <title>{{ title }}</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="/css/app.min.css">
 </head>
 <body>
 <div id="map"></div>
-<script src="/js/app.js"></script>
+<script src="/js/app.min.js"></script>
 <script>
     var pgoMapConfig = {{ jsConfig | raw }};
 </script>

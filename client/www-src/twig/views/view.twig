@@ -1,0 +1,22 @@
+<div id="view-{{ view.name }}"
+     class="view tab{% if view.main %} view-main{% endif %}{% if view.active %} active{% endif %}">
+    {% block topbar %}
+        <div class="navbar bg-gray theme-white color-white">
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+                </div>
+                <div class="center sliding">{{ view.title }}</div>
+            </div>
+        </div>
+    {% endblock %}
+    {% block pages %}
+        <div class="pages navbar-through">
+            {% if view.pageMain.twig %}
+                {% include view.pageMain.twig with view.pageMain %}
+            {% else %}
+                {% include (view.name ~ '/pages/' ~ view.pageMain ~ '.twig') with view.pageMain %}
+            {% endif %}
+        </div>
+    {% endblock %}
+</div>
