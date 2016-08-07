@@ -131,3 +131,4 @@ node_modules
 # project ignores
 /https-key.pem
 /https-cert.pem
+server/config/config.json
