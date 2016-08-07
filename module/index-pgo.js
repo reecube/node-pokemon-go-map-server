@@ -2,6 +2,33 @@
 
 module.exports = function (core) {
     let pgoConfig = core.config.pgo,
+        cloneAccounts = function (refAccounts) {
+            let result = [];
+
+            for (let idx in refAccounts) {
+                result.push({
+                    username: refAccounts[idx].username,
+                    password: refAccounts[idx].password,
+                    provider: refAccounts[idx].provider
+                });
+            }
+
+            return result;
+        },
+        addAccounts = function (refAccounts) {
+            let result = [];
+
+            for (let idx in refAccounts) {
+                result.push(refAccounts[idx]);
+            }
+
+            return result;
+        },
+        accounts = cloneAccounts(pgoConfig.accounts),
+        currAccounts = addAccounts(accounts),
+        getOpenAccount = function () {
+            return currAccounts.pop();
+        },
         pgoApi = require('pokemon-go-node-api'),
         pgo,
         pokedex = require('./data/pokedex.json'),
@@ -17,7 +44,7 @@ module.exports = function (core) {
             console.error('[!] An error occured!');
             console.trace(err);
 
-            res.status(500).send(err);
+            return res.status(500).send(err);
         },
         cbSuccess = function (req, res, jsConfig) {
             res.render('index', {
@@ -38,7 +65,7 @@ module.exports = function (core) {
         getPokemonByNumber = function (pokedexNumber) {
             return pokedex.pokemon[pokedexNumber - 1];
         },
-        doAllTheStuff = function (req, res) {
+        doAllTheStuff = function (req, res, openAccount) {
             console.log('[i] Current location: ' + pgo.playerInfo.locationName);
             console.log('[i] lat/long/alt: : ' + pgo.playerInfo.latitude + ' ' + pgo.playerInfo.longitude + ' ' + pgo.playerInfo.altitude);
 
@@ -99,6 +126,9 @@ module.exports = function (core) {
                     }
                 }
 
+                // FIXME: currently only 1 step allowed
+                steps = 1;
+
                 let nearbyPokemon = [],
                     queueLocations = [],
                     pgoLoc = pgo.GetLocationCoords(),
@@ -122,6 +152,10 @@ module.exports = function (core) {
 
                         console.log('[i] Nearby Pokemon: ', realNearbyPokemon.length);
 
+                        setTimeout(function () {
+                            currAccounts.push(openAccount);
+                        }, 2000);
+
                         return cbSuccess(req, res, {
                             zoom: 18,
                             location: {
@@ -131,9 +165,10 @@ module.exports = function (core) {
                             pokemon: realNearbyPokemon
                         });
                     },
-                    delta = 0.0025,
-                    pgoLat = pgoLoc.latitude - (steps / 2) * delta,
-                    pgoLng = pgoLoc.longitude - (steps / 2) * delta,
+                    deltaLat = 0.0008,
+                    deltaLng = 0.0010,
+                    pgoLat = pgoLoc.latitude - (steps / 2) * deltaLat,
+                    pgoLng = pgoLoc.longitude - (steps / 2) * deltaLng,
                     pgoAlt = pgoLoc.altitude,
                     totLocations = steps * steps,
                     totLocationsStr = totLocations.toString();
@@ -141,8 +176,8 @@ module.exports = function (core) {
                 for (let x = 0; x < steps; x++) {
                     for (let y = 0; y < steps; y++) {
                         queueLocations.push({
-                            latitude: pgoLat + x * delta,
-                            longitude: pgoLng + y * delta,
+                            latitude: pgoLat + x * deltaLat,
+                            longitude: pgoLng + y * deltaLng,
                             altitude: pgoAlt
                         })
                     }
@@ -223,28 +258,37 @@ module.exports = function (core) {
         };
 
     return function (req, res) {
-        let newLocation = pgoConfig.location,
-            paramLoc = '';
+        let openAccount = getOpenAccount();
 
-        if (req.body && req.body.location) {
-            paramLoc = req.body.location;
-        } else if (req.query && req.query.location) {
-            paramLoc = req.query.location;
-        }
+        if (openAccount) {
+            let newLocation = pgoConfig.location,
+                paramLoc = '';
 
-        if (paramLoc) {
-            try {
-                newLocation = JSON.parse(paramLoc);
-            } catch (err) {
-                return handleError(req, res, err);
+            if (req.body && req.body.location) {
+                paramLoc = req.body.location;
+            } else if (req.query && req.query.location) {
+                paramLoc = req.query.location;
             }
+
+            if (paramLoc) {
+                try {
+                    newLocation = JSON.parse(paramLoc);
+                } catch (err) {
+                    return handleError(req, res, err);
+                }
+            }
+
+            pgo = new pgoApi.Pokeio();
+            pgo.init(openAccount.username, openAccount.password, newLocation, openAccount.provider, safeCallback(req, res, function (err) {
+                if (err) return handleError(req, res, err);
+
+                return doAllTheStuff(req, res, openAccount);
+            }));
+        } else {
+            return handleError(req, res, {
+                'error': true,
+                'message': 'There are no open accounts!'
+            });
         }
-
-        pgo = new pgoApi.Pokeio();
-        pgo.init(pgoConfig.username, pgoConfig.password, newLocation, pgoConfig.provider, safeCallback(req, res, function (err) {
-            if (err) return handleError(req, res, err);
-
-            return doAllTheStuff(req, res);
-        }));
     };
 };

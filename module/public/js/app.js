@@ -3,7 +3,7 @@ function initMap() {
                 pokemon: []
             },
         map = new google.maps.Map(document.getElementById('map'), {
-            minZoom: 15,
+            minZoom: 10,
             zoom: config.zoom,
             center: config.location
         }),
@@ -29,6 +29,28 @@ function initMap() {
             anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
         }
     });
+
+    //var deltaLat = 0.0008,
+    //    deltaLng = 0.0010,
+    //    steps = 10;
+    //
+    //for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
+    //    for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
+    //        new google.maps.Marker({
+    //            position: {
+    //                lat: config.location.lat + (stpLat * deltaLat),
+    //                lng: config.location.lng + (stpLng * deltaLng)
+    //            },
+    //            map: map,
+    //            icon: {
+    //                url: '/img/pokeball.png',
+    //                scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
+    //                origin: new google.maps.Point(0, 0),
+    //                anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
+    //            }
+    //        });
+    //    }
+    //}
 
     for (var i = 0; i < config.pokemon.length; i++) {
         var mLoc = config.pokemon[i].location,
