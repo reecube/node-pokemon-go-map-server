@@ -19,6 +19,34 @@ function initMap() {
     }
 
     var sizeCurrPos = size / 2;
+
+    (function () {
+        // shows the scan-ghosts
+        var deltaLat = 0.0012, // y
+            deltaLng = 0.0016,
+            steps = 10;
+
+        for (var stpLat = -Math.floor(steps / 2); stpLat < Math.floor(steps / 2); stpLat++) {
+            for (var stpLng = -Math.floor(steps / 2); stpLng < Math.floor(steps / 2); stpLng++) {
+                if (!(stpLat == 0 && stpLng == 0)) {
+                    new google.maps.Marker({
+                        position: {
+                            lat: config.location.lat + (stpLat * deltaLat),
+                            lng: config.location.lng + (stpLng * deltaLng)
+                        },
+                        map: map,
+                        icon: {
+                            url: '/img/ghost.png',
+                            scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
+                            origin: new google.maps.Point(0, 0),
+                            anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
+                        }
+                    });
+                }
+            }
+        }
+    })();
+
     new google.maps.Marker({
         position: config.location,
         map: map,
@@ -29,28 +57,6 @@ function initMap() {
             anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
         }
     });
-
-    //var deltaLat = 0.0008,
-    //    deltaLng = 0.0010,
-    //    steps = 10;
-    //
-    //for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
-    //    for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
-    //        new google.maps.Marker({
-    //            position: {
-    //                lat: config.location.lat + (stpLat * deltaLat),
-    //                lng: config.location.lng + (stpLng * deltaLng)
-    //            },
-    //            map: map,
-    //            icon: {
-    //                url: '/img/pokeball.png',
-    //                scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
-    //                origin: new google.maps.Point(0, 0),
-    //                anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
-    //            }
-    //        });
-    //    }
-    //}
 
     for (var i = 0; i < config.pokemon.length; i++) {
         var mLoc = config.pokemon[i].location,

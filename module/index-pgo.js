@@ -127,7 +127,7 @@ module.exports = function (core) {
                 }
 
                 // FIXME: currently only 1 step allowed
-                steps = 1;
+                steps = 3;
 
                 let nearbyPokemon = [],
                     queueLocations = [],
@@ -167,19 +167,16 @@ module.exports = function (core) {
                     },
                     deltaLat = 0.0008,
                     deltaLng = 0.0010,
-                    pgoLat = pgoLoc.latitude - (steps / 2) * deltaLat,
-                    pgoLng = pgoLoc.longitude - (steps / 2) * deltaLng,
-                    pgoAlt = pgoLoc.altitude,
                     totLocations = steps * steps,
                     totLocationsStr = totLocations.toString();
 
-                for (let x = 0; x < steps; x++) {
-                    for (let y = 0; y < steps; y++) {
+                for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
+                    for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
                         queueLocations.push({
-                            latitude: pgoLat + x * deltaLat,
-                            longitude: pgoLng + y * deltaLng,
-                            altitude: pgoAlt
-                        })
+                            latitude: pgoLoc.latitude + stpLat * deltaLat,
+                            longitude: pgoLoc.longitude + stpLng * deltaLng,
+                            altitude: pgoLoc.altitude
+                        });
                     }
                 }
 
@@ -232,7 +229,9 @@ module.exports = function (core) {
                                         }
                                     }
 
-                                    return crawl(errors);
+                                    setTimeout(function () {
+                                        return crawl(errors);
+                                    }, 2000);
                                 }));
                             }
                         }));
