@@ -1,0 +1,11 @@
+{
+  "pgo": {
+    "maps": {
+      "apikey": "TODO"
+    },
+    "accounts": []
+  },
+  "server": {
+    "port": 12345
+  }
+}

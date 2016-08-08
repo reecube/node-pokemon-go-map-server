@@ -9,9 +9,27 @@ module.exports = function () {
             provider: 'google'
         }),
     // custom config
-        config = require('./config/config.json')
+        configDefault = require('./config/config-default.json'),
+        configUser = require('./config/config.json'),
     // custom functions
-        ;
+        mergeObjects = function (objA, objB) {
+            let objResult = {};
+
+            for (let keyA in objA) {
+                objResult[keyA] = objA[keyA];
+            }
+
+            for (let keyB in objB) {
+                if (typeof objResult[keyB] == 'object'
+                    && typeof objB[keyB] == 'object') {
+                    objResult[keyB] = mergeObjects(objResult[keyB], objB[keyB])
+                } else {
+                    objResult[keyB] = objB[keyB];
+                }
+            }
+
+            return objResult;
+        };
 
     return {
         node: {
@@ -23,7 +41,7 @@ module.exports = function () {
             async: async,
             geocoder: geocoder
         },
-        config: config,
+        config: mergeObjects(configDefault, configUser),
         fnc: {
             // TODO
         }
