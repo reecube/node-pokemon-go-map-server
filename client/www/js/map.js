@@ -48,7 +48,8 @@ loadPokemonMarker = function (location) {
         var resObj = JSON.parse(response);
 
         if (!resObj.error) {
-            var size = getMarkerSize();
+            var size = getMarkerSize(),
+                sizeCurrPos = size / 2;
 
             for (var key in resObj.wildpokemon) {
                 var tmpPokemon = resObj.wildpokemon[key];
@@ -78,6 +79,20 @@ loadPokemonMarker = function (location) {
 
                 wildpokemon[key] = tmpPokemon;
             }
+
+            new google.maps.Marker({
+                position: {
+                    lat: location.latitude,
+                    lng: location.longitude
+                },
+                map: map,
+                icon: {
+                    url: '/img/ghost.png',
+                    scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
+                    origin: new google.maps.Point(0, 0),
+                    anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
+                }
+            });
         } else {
             if (resObj.message) {
                 if (resObj.shouldRetryLater) {
