@@ -29,7 +29,18 @@ module.exports = function (core) {
         currAccounts = addAccounts(accounts),
     // all the other definitions
         pgoApi = require('pokemon-go-node-api'),
-        pokedex = require('./data/pokedex.json');
+        pokedex = require('./data/pokedex.json'),
+        getPokemonByNumber = function (number) {
+            let result = null;
+
+            for (let idx in pokedex.pokemon) {
+                if (pokedex.pokemon[idx].id == number) {
+                    result = pokedex.pokemon
+                }
+            }
+
+            return result;
+        };
 
     return function (req, res) {
         let showResult = function (status, result) {
