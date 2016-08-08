@@ -5,6 +5,9 @@ module.exports = function () {
         fs = require('fs'),
         _ = require('lodash'),
         async = require('async'),
+        geocoder = require('node-geocoder')({
+            provider: 'google'
+        }),
     // custom config
         config = require('./config/config.json')
     // custom functions
@@ -17,7 +20,8 @@ module.exports = function () {
         },
         npm: {
             _: _,
-            async: async
+            async: async,
+            geocoder: geocoder
         },
         config: config,
         fnc: {

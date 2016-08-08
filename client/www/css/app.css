@@ -88,11 +88,13 @@ html, body {
 #content .view.preparing {
     display: block;
 
-    position: fixed;
+    position: absolute;
     top: 100%;
     left: 100%;
 
     opacity: 0.001;
+
+    pointer-events: none;
 }
 
 .view-table {

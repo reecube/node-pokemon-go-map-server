@@ -4,6 +4,7 @@ let Core = require('./index-core'),
     core = Core(),
     PGO = require('./index-pgo'),
     Client = require('./index-client'),
+    Geocoder = require('./index-geocoder'),
     HTTP = require('./index-http'),
     HTTPS = require('./index-https'),
     swig = require('swig'),
@@ -24,6 +25,8 @@ app.use('/', express.static(__dirname + '/../client/www'));
 app.get('/', Client(core));
 
 app.get('/api', PGO(core));
+
+app.get('/geocoder', Geocoder(core));
 
 let useHttp = function () {
         let http = HTTP(core);

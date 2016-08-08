@@ -1,5 +1,22 @@
 (function () {
-    var loadView = function (viewName) {
+    var httpRequest = function (method, url, callback) {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {
+                    return callback(xmlhttp.status, xmlhttp.response);
+                }
+            };
+
+            xmlhttp.open(method, url, true);
+            xmlhttp.send();
+        },
+        prepareView = function (viewName) {
+            var view = document.querySelector('.view[data-view="' + viewName + '"]');
+
+            view.classList.add('preparing');
+        },
+        loadView = function (viewName) {
             var view = document.querySelector('.view[data-view="' + viewName + '"]'),
                 views = document.querySelectorAll('.view');
 
@@ -117,9 +134,6 @@
     document.querySelector('.js-show-map').addEventListener('click', function (event) {
         event.preventDefault();
 
-        // FIXME: this is outdated and now WIP
-        console.warn('This is WIP!');
-
         var steps = parseInt(document.getElementById('input-steps').value),
             location = {
                 type: document.getElementById('input-location-type').value,
@@ -128,21 +142,48 @@
                     latitude: parseFloat(document.getElementById('input-location-coords-lat').value) || 0,
                     longitude: parseFloat(document.getElementById('input-location-coords-lng').value) || 0
                 }
+            },
+            cbContinue = function (loc) {
+                return initMap({
+                    zoom: 18,
+                    location: loc,
+                    showGhost: true
+                }, function (markerLocation) {
+                    return loadView('map');
+                });
             };
 
         saveToLocalStorage(steps, JSON.stringify(location));
 
-        return initMap({
-            zoom: 18,
-            location: {
-                // FIXME: this could also be the name
+        prepareView('map');
+
+        if (location.type == 'name' && location.name) {
+            return httpRequest('GET', '/geocoder?name=' + encodeURIComponent(location.name), function (status, response) {
+                var resObj = JSON.parse(response);
+
+                if (!resObj.error
+                    && resObj.location) {
+                    return cbContinue({
+                        lat: resObj.location.latitude,
+                        lng: resObj.location.longitude
+                    });
+                } else {
+                    if (resObj.message) {
+                        return console.error(status, resObj.message);
+                    } else {
+                        return console.error(status, 'No valid location!');
+                    }
+                }
+            });
+        }
+        else if (location.type == 'coords' && location.coords) {
+            return cbContinue({
                 lat: location.coords.latitude,
                 lng: location.coords.longitude
-            },
-            showGhost: true
-        }, function (markerLocation) {
-            return loadView('map');
-        });
+            });
+        } else {
+            return console.error('No valid location!');
+        }
     }, false);
 
     document.querySelector('.js-refresh-map').addEventListener('click', function (event) {
