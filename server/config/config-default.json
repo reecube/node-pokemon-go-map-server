@@ -1,8 +1,8 @@
 {
-  "pgo": {
     "maps": {
       "apikey": "TODO"
     },
+  "pgo": {
     "accounts": []
   },
   "server": {

@@ -50,7 +50,7 @@ module.exports = function (core) {
             res.render('index', {
                 title: 'Pokemon GO Map',
                 jsConfig: JSON.stringify(jsConfig),
-                apiKey: core.config.pgo.maps.apikey
+                apiKey: core.config.maps.apikey
             });
         },
         safeCallback = function (req, res, cb) {
