@@ -136,7 +136,22 @@
                     zoom: 18,
                     location: loc,
                     showGhost: true
-                }, function (markerLocation) {
+                }, function () {
+                    // TODO: start loading the pokemon markers here
+
+                    let deltaLat = 0.0008,
+                        deltaLng = 0.0010;
+
+                    for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
+                        for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
+                            loadPokemonMarker({
+                                latitude: loc.lat + stpLat * deltaLat,
+                                longitude: loc.lng + stpLng * deltaLng,
+                                altitude: loc.alt
+                            });
+                        }
+                    }
+
                     return loadView('map');
                 });
             };

@@ -1,10 +1,14 @@
-function initMap(config, callback) {
-    var map = new google.maps.Map(document.getElementById('map'), {
-            minZoom: 10,
-            zoom: config.zoom,
-            center: config.location
-        }),
-        sizeMin = 40,
+var map,
+    markerLocation;
+
+initMap = function (config, callback) {
+    map = new google.maps.Map(document.getElementById('map'), {
+        minZoom: 10,
+        zoom: config.zoom,
+        center: config.location
+    });
+
+    var sizeMin = 40,
         sizeMax = 120,
         wSize = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth,
         size = wSize / 10;
@@ -49,7 +53,7 @@ function initMap(config, callback) {
         })();
     }
 
-    var markerLocation = new google.maps.Marker({
+    markerLocation = new google.maps.Marker({
         position: config.location,
         map: map,
         icon: {
@@ -114,5 +118,21 @@ function initMap(config, callback) {
     //};
     //updatePokemon();
 
-    return callback(markerLocation);
+    return callback(map, markerLocation);
+};
+
+loadPokemonMarker = function (location) {
+    return httpRequest('GET', '/api?location=' + encodeURIComponent(JSON.stringify(location)), function (status, response) {
+        var resObj = JSON.parse(response);
+
+        if (!resObj.error) {
+            console.log('called', status, resObj);
+        } else {
+            if (resObj.message) {
+                return console.error(status, resObj.message);
+            } else {
+                return console.error(status, 'No valid location!');
+            }
+        }
+    });
 };
