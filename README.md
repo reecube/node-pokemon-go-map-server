@@ -14,31 +14,20 @@ First install the npm dependencies:
 npm install
 ```
 
-Then make the config file, here is an example:
+Then make the config file, you can copy 'config-default.json' to 'config.json' and change the depending values.
+You can remove the fields where you didn't change the value.
+For the accounts, here is an example:
 
 ```
 {
     "username": "TODO",
     "password": "TODO",
-    "provider": "TODO:ptc/google",
-    "location": {
-        "name": "TODO"
-        "coords": {
-            "latitude": TODO,
-            "longitude": TODO,
-            "altitude": TODO
-        },
-        "type": "TODO: name/coords",
-    },
-    "steps": TODO,
-    "maps": {
-        "apikey": "TODO"
-    }
+    "provider": "TODO:ptc/google"
 }
 
 ```
 
-This file is stored under `TODO`.
+This file is stored under `./server/config/config.json`.
 
 ## HTTPS Certificates
 
