@@ -1,8 +1,12 @@
 {
-    "maps": {
-      "apikey": "TODO"
-    },
+  "maps": {
+    "apikey": "TODO"
+  },
   "pgo": {
+    "api": {
+      "safeTime": 5000,
+      "sessionLifetime": 900000
+    },
     "accounts": []
   },
   "server": {

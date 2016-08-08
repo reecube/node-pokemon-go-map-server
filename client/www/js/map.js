@@ -1,7 +1,10 @@
 var map,
-    markerLocation;
+    markerLocation,
+    wildpokemon = {};
 
 initMap = function (config, callback) {
+    wildpokemon = {};
+
     map = new google.maps.Map(document.getElementById('map'), {
         minZoom: 10,
         zoom: config.zoom,
@@ -126,13 +129,84 @@ loadPokemonMarker = function (location) {
         var resObj = JSON.parse(response);
 
         if (!resObj.error) {
-            console.log('called', status, resObj);
+            var sizeMin = 40,
+                sizeMax = 120,
+                wSize = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth,
+                size = wSize / 10;
+
+            if (size < sizeMin) {
+                size = sizeMin;
+            } else if (size > sizeMax) {
+                size = sizeMax;
+            }
+
+            for (var key in resObj.wildpokemon) {
+                var tmpPokemon = resObj.wildpokemon[key];
+
+                tmpPokemon.marker = new google.maps.Marker({
+                    position: tmpPokemon.location,
+                    map: map,
+                    icon: {
+                        url: tmpPokemon.pokedex.img,
+                        scaledSize: new google.maps.Size(size, size),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(size / 2, size)
+                    },
+                    infoWindow: new google.maps.InfoWindow({
+                        content: '<p id="infowindow-content-' + key + '">'
+                        + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
+                            //+ pokemon.type + '<br><br>'
+                        + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
+                        + '</p>'
+                    })
+                });
+
+                google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
+                    var cMarker = this;
+                    cMarker.infoWindow.open(map, cMarker);
+                });
+
+                wildpokemon[key] = tmpPokemon;
+            }
         } else {
             if (resObj.message) {
-                return console.error(status, resObj.message);
+                if (resObj.shouldRetryLater) {
+                    return setTimeout(function () {
+                        return loadPokemonMarker(location);
+                        // FIXME: this interval should be loaded from config
+                    }, 5000);
+                } else {
+                    return console.error(status, resObj.message);
+                }
             } else {
                 return console.error(status, 'No valid location!');
             }
         }
     });
 };
+
+intervalUpdatePokemon = setInterval(function () {
+    for (var key in wildpokemon) {
+        var infoWindow = document.getElementById('infowindow-content-' + key);
+
+        if (infoWindow) {
+            var element = infoWindow.querySelector('[data-ts-hidden]'),
+                dataTsHidden = element.getAttribute('data-ts-hidden'),
+                tsHidden = parseInt(dataTsHidden),
+                rest = tsHidden - new Date().getTime(),
+                restSecs = Math.round(rest / 1000),
+                realSecs = restSecs % 60,
+                realMins = (restSecs - realSecs) / 60;
+
+            if (rest > 0) {
+                element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
+            } else {
+                console.warn('onUpdatePokemon', wildpokemon[key], rest);
+
+                wildpokemon[key].marker.setMap(null);
+
+                delete wildpokemon[key];
+            }
+        }
+    }
+}, 500);
