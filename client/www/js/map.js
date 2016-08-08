@@ -115,4 +115,4 @@ function initMap(config, callback) {
     //updatePokemon();
 
     return callback(markerLocation);
-}
+};
