@@ -17,10 +17,16 @@
         },
         loadCoordinates = function () {
             return navigator.geolocation.getCurrentPosition(function (position) {
-                document.getElementById('input-location-coords-lat').value = position.coords.latitude;
-                document.getElementById('input-location-coords-lng').value = position.coords.longitude;
+                if (position && position.coords && typeof position.coords.accuracy == 'number') {
+                    if (position.coords.accuracy > 50) {
+                        console.warn('The gps signal is too inaccurate with', position.coords.accuracy, 'meters');
+                    }
 
-                console.log('More or less ' + position.coords.accuracy + ' meters.');
+                    document.getElementById('input-location-coords-lat').value = position.coords.latitude;
+                    document.getElementById('input-location-coords-lng').value = position.coords.longitude;
+                } else {
+                    console.warn('Could not get the geolocation for the position:', position);
+                }
             }, function error(err) {
                 console.warn('geolocation:', err);
             }, {

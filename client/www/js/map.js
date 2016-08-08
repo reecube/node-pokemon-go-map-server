@@ -18,6 +18,7 @@ function initMap(config, callback) {
     var sizeCurrPos = size / 2;
 
     if (config && config.showGhost) {
+        // FIXME: this is just for dev-uses, remove it later
         (function () {
             if (config.location && config.location.lat && config.location.lng) {
                 // shows the scan-ghosts
