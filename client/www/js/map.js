@@ -2,15 +2,7 @@ var map,
     markerLocation,
     wildpokemon = {};
 
-initMap = function (config, callback) {
-    wildpokemon = {};
-
-    map = new google.maps.Map(document.getElementById('map'), {
-        minZoom: 10,
-        zoom: config.zoom,
-        center: config.location
-    });
-
+getMarkerSize = function () {
     var sizeMin = 40,
         sizeMax = 120,
         wSize = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth,
@@ -22,7 +14,20 @@ initMap = function (config, callback) {
         size = sizeMax;
     }
 
-    var sizeCurrPos = size / 2;
+    return size;
+};
+
+initMap = function (config, callback) {
+    wildpokemon = {};
+
+    map = new google.maps.Map(document.getElementById('map'), {
+        minZoom: 10,
+        zoom: config.zoom,
+        center: config.location
+    });
+
+    var size = getMarkerSize(),
+        sizeCurrPos = size / 2;
 
     markerLocation = new google.maps.Marker({
         position: config.location,
@@ -43,16 +48,7 @@ loadPokemonMarker = function (location) {
         var resObj = JSON.parse(response);
 
         if (!resObj.error) {
-            var sizeMin = 40,
-                sizeMax = 120,
-                wSize = window.innerWidth > window.innerHeight ? window.innerHeight : window.innerWidth,
-                size = wSize / 10;
-
-            if (size < sizeMin) {
-                size = sizeMin;
-            } else if (size > sizeMax) {
-                size = sizeMax;
-            }
+            var size = getMarkerSize();
 
             for (var key in resObj.wildpokemon) {
                 var tmpPokemon = resObj.wildpokemon[key];
