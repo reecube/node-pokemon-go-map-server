@@ -134,8 +134,7 @@
             cbContinue = function (loc) {
                 return initMap({
                     zoom: 18,
-                    location: loc,
-                    showGhost: true
+                    location: loc
                 }, function () {
                     // TODO: start loading the pokemon markers here
 
