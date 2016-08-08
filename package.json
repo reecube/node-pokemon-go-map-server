@@ -2,10 +2,7 @@
   "name": "node-pokemon-go-map-server",
   "version": "0.0.1",
   "description": "TODO",
-  "main": "module/index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "main": "server/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/reecube/node-pokemon-go-map-server.git"

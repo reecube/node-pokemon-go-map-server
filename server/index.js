@@ -3,6 +3,7 @@
 let Core = require('./index-core'),
     core = Core(),
     PGO = require('./index-pgo'),
+    Client = require('./index-client'),
     HTTP = require('./index-http'),
     HTTPS = require('./index-https'),
     swig = require('swig'),
@@ -16,11 +17,13 @@ app.engine('swig', swig.renderFile);
 
 app.set('view engine', 'swig');
 
-app.set('views', __dirname + '/templates');
+app.set('views', __dirname + '/../client/templates');
 
-app.use('/', express.static(__dirname + '/public'));
+app.use('/', express.static(__dirname + '/../client/www'));
 
-app.get('/', PGO(core));
+app.get('/', Client(core));
+
+app.get('/api', PGO(core));
 
 let useHttp = function () {
         let http = HTTP(core);
