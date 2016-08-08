@@ -2,6 +2,17 @@
     "thanks": "https://github.com/Biuni/PokemonGOPokedex",
     "pokemon": [
         {
+            "id": 0,
+            "num": "000",
+            "name": "Error",
+            "img": "http://www.serebii.net/pokemongo/pokemon/000.png",
+            "type": "Error",
+            "height": "Error",
+            "weight": "Error",
+            "candy": "Error",
+            "egg": "Error"
+        },
+        {
             "id": 1,
             "num": "001",
             "name": "Bulbasaur",

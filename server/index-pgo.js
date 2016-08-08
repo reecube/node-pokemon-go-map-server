@@ -31,11 +31,11 @@ module.exports = function (core) {
         pgoApi = require('pokemon-go-node-api'),
         pokedex = require('./data/pokedex.json'),
         getPokemonByNumber = function (number) {
-            let result = null;
+            let result = pokedex.pokemon[0];
 
             for (let idx in pokedex.pokemon) {
                 if (pokedex.pokemon[idx].id == number) {
-                    result = pokedex.pokemon
+                    result = pokedex.pokemon[idx];
                 }
             }
 
