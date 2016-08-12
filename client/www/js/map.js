@@ -134,7 +134,7 @@ loadPokemonMarker = function (location) {
                         content: '<p id="infowindow-content-' + key + '">'
                         + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
                             //+ pokemon.type + '<br><br>'
-                        + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
+                        + '<span class="js-ts-till-hidden">Loading...</span><br><br>'
                         + '</p>'
                     });
 
@@ -179,38 +179,42 @@ loadPokemonMarker = function (location) {
 };
 
 intervalUpdatePokemon = setInterval(function () {
+    var tsNow = new Date().getTime();
+
     for (var key in wildpokemon) {
-        var infoWindow = document.getElementById('infowindow-content-' + key);
+        var wp = wildpokemon[key];
 
-        if (infoWindow) {
-            var element = infoWindow.querySelector('[data-ts-hidden]'),
-                dataTsHidden = element.getAttribute('data-ts-hidden'),
-                tsHidden = parseInt(dataTsHidden),
-                rest = tsHidden - new Date().getTime(),
-                restSecs = Math.round(rest / 1000),
-                realSecs = restSecs % 60,
-                realMins = (restSecs - realSecs) / 60;
+        if (wp.marker) {
+            var wpTsHidden = wp.tsNow + wp.tsTillHidden,
+                rest = wpTsHidden - tsNow;
 
-            if (wildpokemon[key].tsTillHidden > 0) {
-                if (rest > 0) {
-                    element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
-                } else {
-                    // FIXME: not working as it should
-                    // FIXME: delete here is dangerous, do not use it please!
-                    console.warn('onUpdatePokemon', wildpokemon[key], rest);
+            if (rest > 0) {
+                var infoWindow = document.getElementById('infowindow-content-' + key);
 
-                    wildpokemon[key].marker.setMap(null);
+                if (infoWindow) {
+                    var element = infoWindow.querySelector('.js-ts-till-hidden');
 
-                    delete wildpokemon[key];
+                    if (element) {
+                        var restSecs = Math.round(rest / 1000),
+                            realSecs = restSecs % 60,
+                            realMins = (restSecs - realSecs) / 60;
+
+                        element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
+                    }
                 }
             } else {
-                var msgError = 'Error';
-
-                if (element.innerHTML != msgError) {
-                    console.warn('onUpdatePokemon', wildpokemon[key], dataTsHidden);
+                if (wp.infoWindow) {
+                    wp.infoWindow = null;
                 }
 
-                element.innerHTML = msgError;
+                if (wp.marker) {
+                    wp.marker.setMap(null);
+                    wp.marker = null;
+                }
+
+                wp = null;
+                wildpokemon[key] = null;
+                delete wildpokemon[key];
             }
         }
     }
