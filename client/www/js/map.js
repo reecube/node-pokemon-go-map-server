@@ -145,10 +145,24 @@ loadPokemonMarker = function (location) {
                 // will check if the pokemon already is in the wildpokemon array
                 if (!wildpokemon.hasOwnProperty(key)) {
                     var tmpPokemon = resObj.wildpokemon[key],
+                        getTypesHtml = function (strTypes) {
+                            var result = [],
+                                types = strTypes.trim().split(' / ');
+
+                            for (var idx in types) {
+                                var type = types[idx].trim(),
+                                    lcType = type.toLowerCase();
+
+                                result.push('<img src="/img/types/' + lcType + '.gif" alt="' + type + '">');
+                            }
+
+                            return result.join('&nbsp');
+                        },
+                        htmlTypes = getTypesHtml(tmpPokemon.pokedex.type),
                         infoWindow = new google.maps.InfoWindow({
                             content: '<p id="infowindow-content-' + key + '">'
                             + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
-                                //+ pokemon.type + '<br><br>'
+                            + (htmlTypes ? (htmlTypes + '<br><br>') : '')
                             + '<span class="js-ts-till-hidden">Loading...</span><br><br>'
                             + '</p>'
                         });
