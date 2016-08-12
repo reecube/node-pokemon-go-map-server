@@ -93,6 +93,9 @@ initMap = function (config, callback) {
 
     if (markerLocation) {
         markerLocation.setMap(map);
+        var newIcon = markerLocation.getIcon();
+        newIcon.url = '/img/pokeball-last.png';
+        markerLocation.setIcon(newIcon);
 
         infoMarkers.push(markerLocation);
     }
