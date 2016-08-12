@@ -142,34 +142,37 @@ loadPokemonMarker = function (location) {
 
         if (!resObj.error) {
             for (var key in resObj.wildpokemon) {
-                var tmpPokemon = resObj.wildpokemon[key],
-                    infoWindow = new google.maps.InfoWindow({
-                        content: '<p id="infowindow-content-' + key + '">'
-                        + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
-                            //+ pokemon.type + '<br><br>'
-                        + '<span class="js-ts-till-hidden">Loading...</span><br><br>'
-                        + '</p>'
+                // will check if the pokemon already is in the wildpokemon array
+                if (!wildpokemon[key]) {
+                    var tmpPokemon = resObj.wildpokemon[key],
+                        infoWindow = new google.maps.InfoWindow({
+                            content: '<p id="infowindow-content-' + key + '">'
+                            + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
+                                //+ pokemon.type + '<br><br>'
+                            + '<span class="js-ts-till-hidden">Loading...</span><br><br>'
+                            + '</p>'
+                        });
+
+                    tmpPokemon.marker = addMapMarker({
+                        pos: tmpPokemon.location,
+                        img: tmpPokemon.pokedex.img,
+                        size: size,
+                        infoWindow: infoWindow,
+                        zIndex: tmpPokemon.rarity || google.maps.Marker.MAX_ZINDEX + 1
                     });
 
-                tmpPokemon.marker = addMapMarker({
-                    pos: tmpPokemon.location,
-                    img: tmpPokemon.pokedex.img,
-                    size: size,
-                    infoWindow: infoWindow,
-                    zIndex: tmpPokemon.rarity || google.maps.Marker.MAX_ZINDEX + 1
-                });
+                    google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
+                        var cMarker = this;
 
-                google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
-                    var cMarker = this;
+                        if (cMarker.infoWindow) {
+                            cMarker.infoWindow.open(map, cMarker);
+                        } else {
+                            console.error('Unknown error occured!');
+                        }
+                    });
 
-                    if (cMarker.infoWindow) {
-                        cMarker.infoWindow.open(map, cMarker);
-                    } else {
-                        console.error('Unknown error occured!');
-                    }
-                });
-
-                wildpokemon[key] = tmpPokemon;
+                    wildpokemon[key] = tmpPokemon;
+                }
             }
 
             return markersInfo.push(addMapMarker({
