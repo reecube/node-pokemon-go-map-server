@@ -171,8 +171,8 @@
             });
 
             var calcDistanceToLoc = function (obj) {
-                var absLat = Math.abs(loc.lat - obj.latitude),
-                    absLng = Math.abs(loc.lng - obj.longitude);
+                var absLat = Math.round(Math.abs(loc.lat - obj.latitude) / deltaLat),
+                    absLng = Math.round(Math.abs(loc.lng - obj.longitude) / deltaLng);
 
                 return Math.sqrt(absLat * absLat + absLng * absLng);
             };
