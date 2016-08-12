@@ -120,20 +120,80 @@
     }
 
     var loadPokemonMarkers = function (loc, steps) {
-            // TODO: start loading the pokemon markers here
+            var queueLocations = [],
+                deltaLat = 0.0008,
+                deltaLng = 0.0010,
+                fixLat = -1 * steps * deltaLat,
+                fixLng = -1 * steps * deltaLng;
 
-            var deltaLat = 0.0008,
-                deltaLng = 0.0010;
+            /**
+             * @param radius
+             * @param iterator function (x, y, shouldDraw) { return VALUE; }
+             * @returns {{ VALUE }}
+             */
+            function makeCircle(radius, iterator) {
+                var centerX = radius,
+                    centerY = radius,
+                    dim = (radius * 2) + 1,
+                    arrayWidth = dim,
+                    arrayHeight = dim,
+                    a = {},
+                    x,
+                    y,
+                    d,
+                    yDiff,
+                    threshold,
+                    radiusSq = (dim * dim) / 4;
 
-            for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
-                for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
-                    loadPokemonMarker({
-                        latitude: loc.lat + stpLat * deltaLat,
-                        longitude: loc.lng + stpLng * deltaLng,
+                for (x = 0; x < arrayHeight; x++) {
+                    a[x] = {};
+                    yDiff = x - centerY;
+                    threshold = radiusSq - (yDiff * yDiff);
+                    for (y = 0; y < arrayWidth; y++) {
+                        d = y - centerX;
+                        a[x][y] = iterator(x, y, !((d * d) > threshold));
+                    }
+                }
+
+                return a;
+            }
+
+            makeCircle(steps, function (x, y, shouldDraw) {
+                if (shouldDraw) {
+                    queueLocations.push({
+                        latitude: loc.lat + y * deltaLat + fixLat,
+                        longitude: loc.lng + x * deltaLng + fixLng,
                         altitude: loc.alt
                     });
                 }
-            }
+
+                return shouldDraw;
+            });
+
+            var handleNextLocation = function (callback) {
+                var hadError = false;
+
+                return loadPokemonMarker(queueLocations.shift(), function (err) {
+                    if (err) {
+                        hadError = true;
+                        return console.error(err);
+                    }
+
+                    if (queueLocations.length) {
+                        return handleNextLocation(callback);
+                    } else {
+                        return callback(hadError);
+                    }
+                });
+            };
+
+            if (queueLocations.length) handleNextLocation(function (hadError) {
+                if (hadError) {
+                    return console.error('Could not load all locations.');
+                } else {
+                    return console.log('All locations were successfully loaded.');
+                }
+            });
         },
         lastLocation = null,
         lastSteps = null;

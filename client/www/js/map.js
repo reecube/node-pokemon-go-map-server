@@ -133,7 +133,7 @@ addMapMarker = function (options) {
     });
 };
 
-loadPokemonMarker = function (location) {
+loadPokemonMarker = function (location, callback) {
     return httpRequest('GET', '/api?location=' + encodeURIComponent(JSON.stringify(location)), function (status, response) {
         var resObj = JSON.parse(response);
 
@@ -189,7 +189,7 @@ loadPokemonMarker = function (location) {
                 }
             }
 
-            return markersInfo.push(addMapMarker({
+            markersInfo.push(addMapMarker({
                 pos: {
                     lat: location.latitude,
                     lng: location.longitude
@@ -197,11 +197,13 @@ loadPokemonMarker = function (location) {
                 img: '/img/ghost.png',
                 size: sizeCurrPos
             }));
+
+            return callback(null);
         } else {
             if (resObj.message) {
                 if (resObj.retryLater) {
                     return setTimeout(function () {
-                        return loadPokemonMarker(location);
+                        return loadPokemonMarker(location, callback);
                     }, resObj.retryLater);
                 } else {
                     markersInfo.push(addMapMarker({
@@ -213,10 +215,18 @@ loadPokemonMarker = function (location) {
                         size: sizeCurrPos
                     }));
 
-                    return console.error(status, resObj.message);
+                    return callback({
+                        status: status,
+                        response: resObj,
+                        message: resObj.message
+                    });
                 }
             } else {
-                return console.error(status, 'No valid location!');
+                return callback({
+                    status: status,
+                    response: resObj,
+                    message: 'No valid location!'
+                });
             }
         }
     });
