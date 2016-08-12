@@ -119,9 +119,9 @@ addMapMarker = function (pos, img, size, infoWindow) {
             url: img,
             scaledSize: new google.maps.Size(size, size),
             origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(size / 2, size / 2),
-            infoWindow: infoWindow
-        }
+            anchor: new google.maps.Point(size / 2, size / 2)
+        },
+        infoWindow: infoWindow
     });
 };
 
@@ -134,19 +134,25 @@ loadPokemonMarker = function (location) {
 
         if (!resObj.error) {
             for (var key in resObj.wildpokemon) {
-                var tmpPokemon = resObj.wildpokemon[key];
+                var tmpPokemon = resObj.wildpokemon[key],
+                    infoWindow = new google.maps.InfoWindow({
+                        content: '<p id="infowindow-content-' + key + '">'
+                        + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
+                            //+ pokemon.type + '<br><br>'
+                        + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
+                        + '</p>'
+                    });
 
-                tmpPokemon.marker = addMapMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, new google.maps.InfoWindow({
-                    content: '<p id="infowindow-content-' + key + '">'
-                    + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
-                        //+ pokemon.type + '<br><br>'
-                    + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
-                    + '</p>'
-                }));
+                tmpPokemon.marker = addMapMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, infoWindow);
 
                 google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
                     var cMarker = this;
-                    cMarker.infoWindow.open(map, cMarker);
+
+                    if (cMarker.infoWindow) {
+                        cMarker.infoWindow.open(map, cMarker);
+                    } else {
+                        console.error('Unknown error occured!');
+                    }
                 });
 
                 wildpokemon[key] = tmpPokemon;
