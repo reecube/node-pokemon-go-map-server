@@ -1,7 +1,7 @@
 var map,
     markerLocation,
     wildpokemon = {},
-    infoMarkers = [];
+    markersInfo = [];
 
 getMarkerSize = function () {
     var sizeMin = 40,
@@ -54,16 +54,16 @@ resetMarkers = function (options, callback) {
     }
 
     if (!options.doNotResetInfo) {
-        for (idx in infoMarkers) {
-            infoMarkers[idx].setMap(options.map);
+        for (idx in markersInfo) {
+            markersInfo[idx].setMap(options.map);
 
             if (options.forceReset) {
-                infoMarkers[idx] = null;
+                markersInfo[idx] = null;
             }
         }
 
         if (options.forceReset) {
-            infoMarkers = [];
+            markersInfo = [];
         }
 
         if (markerLocation) {
@@ -97,7 +97,7 @@ initMap = function (config, callback) {
         newIcon.url = '/img/pokeball-last.png';
         markerLocation.setIcon(newIcon);
 
-        infoMarkers.push(markerLocation);
+        markersInfo.push(markerLocation);
     }
 
     markerLocation = new google.maps.Marker({
@@ -161,7 +161,7 @@ loadPokemonMarker = function (location) {
                 wildpokemon[key] = tmpPokemon;
             }
 
-            return infoMarkers.push(addMapMarker({
+            return markersInfo.push(addMapMarker({
                 lat: location.latitude,
                 lng: location.longitude
             }, '/img/ghost.png', sizeCurrPos));
@@ -172,7 +172,7 @@ loadPokemonMarker = function (location) {
                         return loadPokemonMarker(location);
                     }, resObj.retryLater);
                 } else {
-                    infoMarkers.push(addMapMarker({
+                    markersInfo.push(addMapMarker({
                         lat: location.latitude,
                         lng: location.longitude
                     }, '/img/ghost.png-red', sizeCurrPos));
