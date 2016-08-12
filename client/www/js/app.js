@@ -187,7 +187,7 @@
                     if (tmpTsLastReset != tsLastHardReset) {
                         err = err ? err : 'This request is not valid anymore!';
                     }
-                    
+
                     if (err) {
                         return callback(err);
                     }
