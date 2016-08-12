@@ -122,7 +122,7 @@
     var loadPokemonMarkers = function (loc, steps) {
             // TODO: start loading the pokemon markers here
 
-            let deltaLat = 0.0008,
+            var deltaLat = 0.0008,
                 deltaLng = 0.0010;
 
             for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
