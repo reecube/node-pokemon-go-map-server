@@ -1,6 +1,6 @@
 var map,
-    markerLocation,
     wildpokemon = {},
+    markerLocation,
     markersInfo = [];
 
 getMarkerSize = function () {
