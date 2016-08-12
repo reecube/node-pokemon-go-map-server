@@ -170,6 +170,17 @@
                 return shouldDraw;
             });
 
+            var calcDistanceToLoc = function (obj) {
+                var absLat = Math.abs(loc.lat - obj.latitude),
+                    absLng = Math.abs(loc.lng - obj.longitude);
+
+                return Math.sqrt(absLat * absLat + absLng * absLng);
+            };
+
+            queueLocations = queueLocations.sort(function (a, b) {
+                return calcDistanceToLoc(a) - calcDistanceToLoc(b);
+            });
+
             var handleNextLocation = function (callback) {
                 var hadError = false;
 
