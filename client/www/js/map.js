@@ -101,22 +101,28 @@ initMap = function (config, callback) {
     var size = getMarkerSize(),
         sizeCurrPos = getInfoMarkerSize(size);
 
-    markersLocation.push(addMapMarker(config.location, '/img/pokeball.png', sizeCurrPos));
+    markersLocation.push(addMapMarker({pos: config.location, img: '/img/pokeball.png', size: sizeCurrPos}));
 
     return callback(map, markersLocation);
 };
 
-addMapMarker = function (pos, img, size, infoWindow) {
+/**
+ * Will add a marker to the map.
+ *
+ * @param options object: { pos: ..., img: ..., size: ..., infoWindow: ..., zIndex: ... }
+ */
+addMapMarker = function (options) {
     return new google.maps.Marker({
-        position: pos,
+        position: options.pos,
         map: map,
         icon: {
-            url: img,
-            scaledSize: new google.maps.Size(size, size),
+            url: options.img,
+            scaledSize: new google.maps.Size(options.size, options.size),
             origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(size / 2, size / 2)
+            anchor: new google.maps.Point(options.size / 2, options.size / 2)
         },
-        infoWindow: infoWindow
+        zIndex: options.zIndex,
+        infoWindow: options.infoWindow
     });
 };
 
@@ -138,7 +144,13 @@ loadPokemonMarker = function (location) {
                         + '</p>'
                     });
 
-                tmpPokemon.marker = addMapMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, infoWindow);
+                tmpPokemon.marker = addMapMarker({
+                    pos: tmpPokemon.location,
+                    img: tmpPokemon.pokedex.img,
+                    size: size,
+                    infoWindow: infoWindow,
+                    zIndex: google.maps.Marker.MAX_ZINDEX + 1
+                });
 
                 google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
                     var cMarker = this;
@@ -154,9 +166,13 @@ loadPokemonMarker = function (location) {
             }
 
             return markersInfo.push(addMapMarker({
-                lat: location.latitude,
-                lng: location.longitude
-            }, '/img/ghost.png', sizeCurrPos));
+                pos: {
+                    lat: location.latitude,
+                    lng: location.longitude,
+                },
+                img: '/img/ghost.png',
+                size: sizeCurrPos
+            }));
         } else {
             if (resObj.message) {
                 if (resObj.retryLater) {
@@ -165,9 +181,13 @@ loadPokemonMarker = function (location) {
                     }, resObj.retryLater);
                 } else {
                     markersInfo.push(addMapMarker({
-                        lat: location.latitude,
-                        lng: location.longitude
-                    }, '/img/ghost.png-red', sizeCurrPos));
+                        pos: {
+                            lat: location.latitude,
+                            lng: location.longitude,
+                        },
+                        img: '/img/ghost-red.png',
+                        size: sizeCurrPos
+                    }));
 
                     return console.error(status, resObj.message);
                 }
