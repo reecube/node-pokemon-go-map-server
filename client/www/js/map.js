@@ -1,6 +1,7 @@
 var map,
     markerLocation,
-    wildpokemon = {};
+    wildpokemon = {},
+    infoMarkers = [];
 
 getMarkerSize = function () {
     var sizeMin = 40,
@@ -17,8 +18,62 @@ getMarkerSize = function () {
     return size;
 };
 
+/**
+ * Will reset all the markers depending on the given options.
+ *
+ * @param object options { map: ..., forceReset: ... }
+ */
+resetMarkers = function (options) {
+    if (!options) options = {
+        map: null,
+        forceReset: false,
+        doNotResetPokemon: false,
+        doNotResetInfo: false
+    };
+
+    var idx;
+
+    if (!options.doNotResetPokemon) {
+        for (idx in wildpokemon) {
+            wildpokemon[idx].marker.setMap(options.map);
+
+            if (options.forceReset) {
+                wildpokemon[idx].marker = null;
+                wildpokemon[idx] = null;
+            }
+        }
+
+        if (options.forceReset) {
+            wildpokemon = {};
+        }
+    }
+
+    if (!options.doNotResetInfo) {
+        for (idx in infoMarkers) {
+            infoMarkers[idx].setMap(options.map);
+
+            if (options.forceReset) {
+                infoMarkers[idx] = null;
+            }
+        }
+
+        if (options.forceReset) {
+            infoMarkers = [];
+        }
+
+        if (markerLocation) {
+            markerLocation.setMap(options.map);
+        }
+    }
+};
+
 initMap = function (config, callback) {
-    wildpokemon = {};
+    resetMarkers({
+        map: null,
+        forceReset: true,
+        doNotResetPokemon: false,
+        doNotResetInfo: false
+    });
 
     map = new google.maps.Map(document.getElementById('map'), {
         minZoom: 10,
@@ -28,6 +83,12 @@ initMap = function (config, callback) {
 
     var size = getMarkerSize(),
         sizeCurrPos = size / 2;
+
+    if (markerLocation) {
+        markerLocation.setMap(map);
+
+        infoMarkers.push(markerLocation);
+    }
 
     markerLocation = new google.maps.Marker({
         position: config.location,
@@ -47,30 +108,33 @@ loadPokemonMarker = function (location) {
     return httpRequest('GET', '/api?location=' + encodeURIComponent(JSON.stringify(location)), function (status, response) {
         var resObj = JSON.parse(response);
 
-        if (!resObj.error) {
-            var size = getMarkerSize(),
-                sizeCurrPos = size / 2;
+        var size = getMarkerSize(),
+            sizeCurrPos = size / 2,
+            addMarker = function (pos, img, size, infoWindow) {
+                return new google.maps.Marker({
+                    position: pos,
+                    map: map,
+                    icon: {
+                        url: img,
+                        scaledSize: new google.maps.Size(size, size),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(size / 2, size / 2),
+                        infoWindow: infoWindow
+                    }
+                });
+            };
 
+        if (!resObj.error) {
             for (var key in resObj.wildpokemon) {
                 var tmpPokemon = resObj.wildpokemon[key];
 
-                tmpPokemon.marker = new google.maps.Marker({
-                    position: tmpPokemon.location,
-                    map: map,
-                    icon: {
-                        url: tmpPokemon.pokedex.img,
-                        scaledSize: new google.maps.Size(size, size),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(size / 2, size)
-                    },
-                    infoWindow: new google.maps.InfoWindow({
-                        content: '<p id="infowindow-content-' + key + '">'
-                        + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
-                            //+ pokemon.type + '<br><br>'
-                        + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
-                        + '</p>'
-                    })
-                });
+                tmpPokemon.marker = addMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, new google.maps.InfoWindow({
+                    content: '<p id="infowindow-content-' + key + '">'
+                    + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
+                        //+ pokemon.type + '<br><br>'
+                    + '<span data-ts-hidden="' + (tmpPokemon.tsNow + tmpPokemon.tsTillHidden) + '">Loading...</span><br><br>'
+                    + '</p>'
+                }));
 
                 google.maps.event.addListener(tmpPokemon.marker, 'click', function () {
                     var cMarker = this;
@@ -80,19 +144,10 @@ loadPokemonMarker = function (location) {
                 wildpokemon[key] = tmpPokemon;
             }
 
-            new google.maps.Marker({
-                position: {
-                    lat: location.latitude,
-                    lng: location.longitude
-                },
-                map: map,
-                icon: {
-                    url: '/img/ghost.png',
-                    scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
-                    origin: new google.maps.Point(0, 0),
-                    anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
-                }
-            });
+            return infoMarkers.push(addMarker({
+                lat: location.latitude,
+                lng: location.longitude
+            }, '/img/ghost.png', sizeCurrPos));
         } else {
             if (resObj.message) {
                 if (resObj.retryLater) {
@@ -100,6 +155,11 @@ loadPokemonMarker = function (location) {
                         return loadPokemonMarker(location);
                     }, resObj.retryLater);
                 } else {
+                    infoMarkers.push(addMarker({
+                        lat: location.latitude,
+                        lng: location.longitude
+                    }, '/img/ghost.png-red', sizeCurrPos));
+
                     return console.error(status, resObj.message);
                 }
             } else {
