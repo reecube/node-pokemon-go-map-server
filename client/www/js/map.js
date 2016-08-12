@@ -101,16 +101,7 @@ initMap = function (config, callback) {
     var size = getMarkerSize(),
         sizeCurrPos = getInfoMarkerSize(size);
 
-    markersLocation.push(new google.maps.Marker({
-        position: config.location,
-        map: map,
-        icon: {
-            url: '/img/pokeball.png',
-            scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
-            origin: new google.maps.Point(0, 0),
-            anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
-        }
-    }));
+    markersLocation.push(addMapMarker(config.location, '/img/pokeball.png', sizeCurrPos));
 
     return callback(map, markersLocation);
 };

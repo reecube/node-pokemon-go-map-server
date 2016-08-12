@@ -210,16 +210,7 @@
                 var size = getMarkerSize(),
                     sizeCurrPos = getInfoMarkerSize(size);
 
-                markerLocation = new google.maps.Marker({
-                    position: lastLocation,
-                    map: map,
-                    icon: {
-                        url: '/img/pokeball.png',
-                        scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
-                    }
-                });
+                markersLocation.push(addMapMarker(lastLocation, '/img/pokeball.png', sizeCurrPos));
 
                 loadPokemonMarkers(lastLocation, lastSteps);
             });
