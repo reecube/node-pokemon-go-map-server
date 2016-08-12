@@ -1,0 +1,24 @@
+<div class="panel panel-left panel-reveal">
+    <div class="content-block-title">{{ title }}</div>
+    <div class="list-block">
+        <ul>
+            {% for view in views %}
+                <li>
+                    <a href="{{ view.href }}" class="item-link tab-link close-panel">
+                        <span class="item-content">
+                            {% if view.icon %}
+                                <span class="item-media">
+                                    <i class="on-inactive {{ view.icon }}"></i>
+                                    <i class="on-active {{ view.icon }}-filled"></i>
+                                </span>
+                            {% endif %}
+                            <span class="item-inner">
+                                <span class="item-title">{{ view.title }}</span>
+                            </span>
+                        </span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
