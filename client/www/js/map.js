@@ -203,6 +203,8 @@ intervalUpdatePokemon = setInterval(function () {
                 if (rest > 0) {
                     element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
                 } else {
+                    // FIXME: not working as it should
+                    // FIXME: delete here is dangerous, do not use it please!
                     console.warn('onUpdatePokemon', wildpokemon[key], rest);
 
                     wildpokemon[key].marker.setMap(null);
