@@ -1,4 +1,6 @@
 var map,
+    tsLastReset,
+    tsLastHardReset,
     wildpokemon = {},
     markersLocation = [],
     markersInfo = [];
@@ -36,7 +38,13 @@ resetMarkers = function (options, callback) {
         doNotResetInfo: false
     };
 
+    var tsNow = new Date().getTime();
+
+    tsLastReset = tsNow;
+
     if (options.forceReset) {
+        tsLastHardReset = tsNow;
+
         // if you do force the reset, the map will be forced too
         options.map = null;
     }
@@ -134,7 +142,13 @@ addMapMarker = function (options) {
 };
 
 loadPokemonMarker = function (location, callback) {
+    var tmpTsLastReset = tsLastHardReset;
+
     return httpRequest('GET', '/api?location=' + encodeURIComponent(JSON.stringify(location)), function (status, response) {
+        if (tmpTsLastReset != tsLastHardReset) {
+            return callback('This request is not valid anymore!');
+        }
+
         var resObj = JSON.parse(response);
 
         var size = getMarkerSize(),

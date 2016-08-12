@@ -120,7 +120,8 @@
     }
 
     var loadPokemonMarkers = function (loc, steps) {
-            var queueLocations = [],
+            var tmpTsLastReset = tsLastHardReset,
+                queueLocations = [],
                 deltaLat = 0.0008,
                 deltaLng = 0.0010,
                 fixLat = -1 * steps * deltaLat,
@@ -183,6 +184,10 @@
 
             var handleNextLocation = function (callback) {
                 return loadPokemonMarker(queueLocations.shift(), function (err) {
+                    if (tmpTsLastReset != tsLastHardReset) {
+                        err = err ? err : 'This request is not valid anymore!';
+                    }
+                    
                     if (err) {
                         return callback(err);
                     }
