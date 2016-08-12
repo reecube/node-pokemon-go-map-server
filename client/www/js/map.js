@@ -18,12 +18,17 @@ getMarkerSize = function () {
     return size;
 };
 
+getInfoMarkerSize = function (size) {
+    return size / 2;
+};
+
 /**
  * Will reset all the markers depending on the given options.
  *
- * @param object options { map: ..., forceReset: ... }
+ * @param options object: { map: ..., forceReset: ... }
+ * @param callback function: ()
  */
-resetMarkers = function (options) {
+resetMarkers = function (options, callback) {
     if (!options) options = {
         map: null,
         forceReset: false,
@@ -65,6 +70,8 @@ resetMarkers = function (options) {
             markerLocation.setMap(options.map);
         }
     }
+
+    return callback ? callback() : null;
 };
 
 initMap = function (config, callback) {
@@ -82,7 +89,7 @@ initMap = function (config, callback) {
     });
 
     var size = getMarkerSize(),
-        sizeCurrPos = size / 2;
+        sizeCurrPos = getInfoMarkerSize(size);
 
     if (markerLocation) {
         markerLocation.setMap(map);
@@ -104,31 +111,32 @@ initMap = function (config, callback) {
     return callback(map, markerLocation);
 };
 
+addMapMarker = function (pos, img, size, infoWindow) {
+    return new google.maps.Marker({
+        position: pos,
+        map: map,
+        icon: {
+            url: img,
+            scaledSize: new google.maps.Size(size, size),
+            origin: new google.maps.Point(0, 0),
+            anchor: new google.maps.Point(size / 2, size / 2),
+            infoWindow: infoWindow
+        }
+    });
+};
+
 loadPokemonMarker = function (location) {
     return httpRequest('GET', '/api?location=' + encodeURIComponent(JSON.stringify(location)), function (status, response) {
         var resObj = JSON.parse(response);
 
         var size = getMarkerSize(),
-            sizeCurrPos = size / 2,
-            addMarker = function (pos, img, size, infoWindow) {
-                return new google.maps.Marker({
-                    position: pos,
-                    map: map,
-                    icon: {
-                        url: img,
-                        scaledSize: new google.maps.Size(size, size),
-                        origin: new google.maps.Point(0, 0),
-                        anchor: new google.maps.Point(size / 2, size / 2),
-                        infoWindow: infoWindow
-                    }
-                });
-            };
+            sizeCurrPos = getInfoMarkerSize(size);
 
         if (!resObj.error) {
             for (var key in resObj.wildpokemon) {
                 var tmpPokemon = resObj.wildpokemon[key];
 
-                tmpPokemon.marker = addMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, new google.maps.InfoWindow({
+                tmpPokemon.marker = addMapMarker(tmpPokemon.location, tmpPokemon.pokedex.img, size, new google.maps.InfoWindow({
                     content: '<p id="infowindow-content-' + key + '">'
                     + '<strong>' + tmpPokemon.pokedex.name + '</strong> Nr. ' + tmpPokemon.pokedex.num + '<br><br>'
                         //+ pokemon.type + '<br><br>'
@@ -144,7 +152,7 @@ loadPokemonMarker = function (location) {
                 wildpokemon[key] = tmpPokemon;
             }
 
-            return infoMarkers.push(addMarker({
+            return infoMarkers.push(addMapMarker({
                 lat: location.latitude,
                 lng: location.longitude
             }, '/img/ghost.png', sizeCurrPos));
@@ -155,7 +163,7 @@ loadPokemonMarker = function (location) {
                         return loadPokemonMarker(location);
                     }, resObj.retryLater);
                 } else {
-                    infoMarkers.push(addMarker({
+                    infoMarkers.push(addMapMarker({
                         lat: location.latitude,
                         lng: location.longitude
                     }, '/img/ghost.png-red', sizeCurrPos));

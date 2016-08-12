@@ -119,6 +119,25 @@
         }, false);
     }
 
+    var loadPokemonMarkers = function (loc, steps) {
+            // TODO: start loading the pokemon markers here
+
+            let deltaLat = 0.0008,
+                deltaLng = 0.0010;
+
+            for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
+                for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
+                    loadPokemonMarker({
+                        latitude: loc.lat + stpLat * deltaLat,
+                        longitude: loc.lng + stpLng * deltaLng,
+                        altitude: loc.alt
+                    });
+                }
+            }
+        },
+        lastLocation = null,
+        lastSteps = null;
+
     document.querySelector('.js-show-map').addEventListener('click', function (event) {
         event.preventDefault();
 
@@ -136,20 +155,10 @@
                     zoom: 18,
                     location: loc
                 }, function () {
-                    // TODO: start loading the pokemon markers here
+                    lastLocation = loc;
+                    lastSteps = steps;
 
-                    let deltaLat = 0.0008,
-                        deltaLng = 0.0010;
-
-                    for (var stpLat = -(steps / 2); stpLat < (steps / 2); stpLat++) {
-                        for (var stpLng = -(steps / 2); stpLng < (steps / 2); stpLng++) {
-                            loadPokemonMarker({
-                                latitude: loc.lat + stpLat * deltaLat,
-                                longitude: loc.lng + stpLng * deltaLng,
-                                altitude: loc.alt
-                            });
-                        }
-                    }
+                    loadPokemonMarkers(lastLocation, lastSteps);
 
                     return loadView('map');
                 });
@@ -191,8 +200,32 @@
     document.querySelector('.js-refresh-map').addEventListener('click', function (event) {
         event.preventDefault();
 
-        // FIXME: this is outdated
-        console.error('This is outdated!');
+        if (lastLocation && lastSteps) {
+            return resetMarkers({
+                map: null,
+                forceReset: true,
+                doNotResetPokemon: false,
+                doNotResetInfo: false
+            }, function () {
+                var size = getMarkerSize(),
+                    sizeCurrPos = getInfoMarkerSize(size);
+
+                markerLocation = new google.maps.Marker({
+                    position: lastLocation,
+                    map: map,
+                    icon: {
+                        url: '/img/pokeball.png',
+                        scaledSize: new google.maps.Size(sizeCurrPos, sizeCurrPos),
+                        origin: new google.maps.Point(0, 0),
+                        anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
+                    }
+                });
+
+                loadPokemonMarkers(lastLocation, lastSteps);
+            });
+        } else {
+            console.error('Unknown error occured!');
+        }
     }, false);
 
     document.querySelector('.js-coords-from-gps').addEventListener('click', function (event) {
