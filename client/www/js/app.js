@@ -210,7 +210,12 @@
                 var size = getMarkerSize(),
                     sizeCurrPos = getInfoMarkerSize(size);
 
-                markersLocation.push(addMapMarker({pos: lastLocation, img: '/img/pokeball.png', size: sizeCurrPos}));
+                markersLocation.push(addMapMarker({
+                    pos: lastLocation,
+                    img: '/img/pokeball.png',
+                    size: sizeCurrPos,
+                    zIndex: 1
+                }));
 
                 loadPokemonMarkers(lastLocation, lastSteps);
             });

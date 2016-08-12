@@ -68,6 +68,8 @@ module.exports = function (core) {
                                     tmpPokedex = getPokemonByNumber(tmpPokemon.pokemon.PokemonId);
 
                                 wildpokemon[tmpPokemon.EncounterId + ''] = {
+                                    // TODO: implement this, should be > 1
+                                    rarity: 10,
                                     location: {
                                         lat: tmpPokemon.Latitude,
                                         lng: tmpPokemon.Longitude
