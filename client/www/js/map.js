@@ -196,14 +196,24 @@ intervalUpdatePokemon = setInterval(function () {
                 realSecs = restSecs % 60,
                 realMins = (restSecs - realSecs) / 60;
 
-            if (rest > 0) {
-                element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
+            if (wildpokemon[key].tsTillHidden > 0) {
+                if (rest > 0) {
+                    element.innerHTML = realMins + 'mins, ' + realSecs + 'secs';
+                } else {
+                    console.warn('onUpdatePokemon', wildpokemon[key], rest);
+
+                    wildpokemon[key].marker.setMap(null);
+
+                    delete wildpokemon[key];
+                }
             } else {
-                console.warn('onUpdatePokemon', wildpokemon[key], rest);
+                var msgError = 'Error';
 
-                wildpokemon[key].marker.setMap(null);
+                if (element.innerHTML != msgError) {
+                    console.warn('onUpdatePokemon', wildpokemon[key], dataTsHidden);
+                }
 
-                delete wildpokemon[key];
+                element.innerHTML = msgError;
             }
         }
     }
