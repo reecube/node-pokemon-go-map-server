@@ -1,6 +1,6 @@
 var map,
     wildpokemon = {},
-    markerLocation,
+    markersLocation = [],
     markersInfo = [];
 
 getMarkerSize = function () {
@@ -36,6 +36,11 @@ resetMarkers = function (options, callback) {
         doNotResetInfo: false
     };
 
+    if (options.forceReset) {
+        // if you do force the reset, the map will be forced too
+        options.map = null;
+    }
+
     var idx;
 
     if (!options.doNotResetPokemon) {
@@ -54,6 +59,14 @@ resetMarkers = function (options, callback) {
     }
 
     if (!options.doNotResetInfo) {
+        for (idx in markersLocation) {
+            markersLocation[idx].setMap(options.map);
+
+            if (options.forceReset) {
+                markersLocation[idx] = null;
+            }
+        }
+
         for (idx in markersInfo) {
             markersInfo[idx].setMap(options.map);
 
@@ -63,11 +76,8 @@ resetMarkers = function (options, callback) {
         }
 
         if (options.forceReset) {
+            markersLocation = [];
             markersInfo = [];
-        }
-
-        if (markerLocation) {
-            markerLocation.setMap(options.map);
         }
     }
 
@@ -91,16 +101,7 @@ initMap = function (config, callback) {
     var size = getMarkerSize(),
         sizeCurrPos = getInfoMarkerSize(size);
 
-    if (markerLocation) {
-        markerLocation.setMap(map);
-        var newIcon = markerLocation.getIcon();
-        newIcon.url = '/img/pokeball-last.png';
-        markerLocation.setIcon(newIcon);
-
-        markersInfo.push(markerLocation);
-    }
-
-    markerLocation = new google.maps.Marker({
+    markersLocation.push(new google.maps.Marker({
         position: config.location,
         map: map,
         icon: {
@@ -109,9 +110,9 @@ initMap = function (config, callback) {
             origin: new google.maps.Point(0, 0),
             anchor: new google.maps.Point(sizeCurrPos / 2, sizeCurrPos / 2)
         }
-    });
+    }));
 
-    return callback(map, markerLocation);
+    return callback(map, markersLocation);
 };
 
 addMapMarker = function (pos, img, size, infoWindow) {
