@@ -30,6 +30,7 @@ module.exports = function (core) {
     // all the other definitions
         pgoApi = require('pokemon-go-node-api'),
         pokedex = require('./data/pokedex.json'),
+        pokemonRarity = require('./data/pokemon-rarity.json'),
         getPokemonByNumber = function (number) {
             let result = pokedex.pokemon[0];
 
@@ -40,6 +41,16 @@ module.exports = function (core) {
             }
 
             return result;
+        },
+        getPokemonRarityByNumber = function (number) {
+            let resultMin = 2,
+                result = resultMin;
+
+            if (pokemonRarity[number]) {
+                result = pokemonRarity[number];
+            }
+
+            return result > resultMin ? result : resultMin;
         };
 
     return function (req, res) {
@@ -68,8 +79,7 @@ module.exports = function (core) {
                                     tmpPokedex = getPokemonByNumber(tmpPokemon.pokemon.PokemonId);
 
                                 wildpokemon[tmpPokemon.EncounterId + ''] = {
-                                    // TODO: implement this, should be > 1
-                                    rarity: 10,
+                                    rarity: getPokemonRarityByNumber(tmpPokemon.pokemon.PokemonId),
                                     location: {
                                         lat: tmpPokemon.Latitude,
                                         lng: tmpPokemon.Longitude
