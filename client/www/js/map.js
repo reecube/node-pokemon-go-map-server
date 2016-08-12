@@ -95,11 +95,10 @@ loadPokemonMarker = function (location) {
             });
         } else {
             if (resObj.message) {
-                if (resObj.shouldRetryLater) {
+                if (resObj.retryLater) {
                     return setTimeout(function () {
                         return loadPokemonMarker(location);
-                        // FIXME: this interval should be loaded from config
-                    }, 5000);
+                    }, resObj.retryLater);
                 } else {
                     return console.error(status, resObj.message);
                 }

@@ -46,17 +46,19 @@ module.exports = function (core) {
         let showResult = function (status, result) {
                 return res.status(status).send(result);
             },
-            handleError = function (err) {
+            handleError = function (acc, err) {
+                console.error(`Error on account '${acc.username}':`);
                 console.trace(err);
                 return showResult(500, {
                     error: true,
-                    message: err.message
+                    message: err.message,
+                    retryLater: pgoConfig.api.safeTime
                 });
             },
             cbReadyForRequest = function (openAccount, pgo) {
                 return pgo.Heartbeat(function (err, hb) {
                     if (err) {
-                        return handleError(err);
+                        return handleError(openAccount, err);
                     } else {
                         let wildpokemon = {};
 
@@ -117,7 +119,7 @@ module.exports = function (core) {
                             coords: paramLoc
                         }, function (err) {
                             if (err) {
-                                return handleError(err);
+                                return handleError(openAccount, err);
                             } else {
                                 return cbReadyForRequest(openAccount, openAccount.currentSession);
                             }
@@ -129,7 +131,7 @@ module.exports = function (core) {
                             coords: paramLoc
                         }, openAccount.provider, function (err) {
                             if (err) {
-                                return handleError(err);
+                                return handleError(openAccount, err);
                             } else {
                                 return cbReadyForRequest(openAccount, openAccount.currentSession);
                             }
@@ -139,7 +141,7 @@ module.exports = function (core) {
                     return showResult(503, {
                         error: true,
                         message: 'No open account available!',
-                        shouldRetryLater: true
+                        retryLater: pgoConfig.api.safeTime
                     });
                 }
             } else {
