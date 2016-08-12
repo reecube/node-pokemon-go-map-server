@@ -182,25 +182,22 @@
             });
 
             var handleNextLocation = function (callback) {
-                var hadError = false;
-
                 return loadPokemonMarker(queueLocations.shift(), function (err) {
                     if (err) {
-                        hadError = true;
-                        return console.error(err);
+                        return callback(err);
                     }
 
                     if (queueLocations.length) {
                         return handleNextLocation(callback);
                     } else {
-                        return callback(hadError);
+                        return callback(null);
                     }
                 });
             };
 
-            if (queueLocations.length) handleNextLocation(function (hadError) {
-                if (hadError) {
-                    return console.error('Could not load all locations.');
+            if (queueLocations.length) handleNextLocation(function (err) {
+                if (err) {
+                    return console.error(err);
                 } else {
                     return console.log('All locations were successfully loaded.');
                 }
