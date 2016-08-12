@@ -143,7 +143,7 @@ loadPokemonMarker = function (location) {
         if (!resObj.error) {
             for (var key in resObj.wildpokemon) {
                 // will check if the pokemon already is in the wildpokemon array
-                if (!wildpokemon[key]) {
+                if (!wildpokemon.hasOwnProperty(key)) {
                     var tmpPokemon = resObj.wildpokemon[key],
                         infoWindow = new google.maps.InfoWindow({
                             content: '<p id="infowindow-content-' + key + '">'
